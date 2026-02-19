@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "mctrl - Machine Control for AI Agents",
+  title: "mctrl - Give Your Agent a Mac",
   description:
     "Fine-grained macOS control for AI agents. Type, click, read screens, manage windows, automate browsers, and more.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
-    title: "mctrl - Machine Control for AI Agents",
+    title: "mctrl - Give Your Agent a Mac",
     description:
       "Fine-grained macOS control for AI agents. Type, click, read screens, manage windows, automate browsers, and more.",
     images: ["/images/hero.jpg"],

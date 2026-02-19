@@ -1,0 +1,10 @@
+website/
+tests/
+assets/
+nanobanana-output/
+.github/
+.gitignore
+.npmrc
+tsconfig.json
+vitest.config.ts
+src/
