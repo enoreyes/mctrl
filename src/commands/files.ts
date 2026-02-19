@@ -28,7 +28,9 @@ files
     let results: string[] = [];
     if (opts.nameOnly) {
       const walk = (d: string) => {
-        for (const ent of readdirSync(d, { withFileTypes: true })) {
+        let entries;
+        try { entries = readdirSync(d, { withFileTypes: true }); } catch { return; }
+        for (const ent of entries) {
           const full = join(d, ent.name);
           if (ent.isDirectory()) walk(full);
           else if (ent.name.toLowerCase().includes(query.toLowerCase())) results.push(full);
