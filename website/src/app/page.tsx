@@ -2,88 +2,65 @@
 
 import { useState } from "react";
 
-const NAV_LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "Install", href: "#install" },
-  { label: "FAQ", href: "#faq" },
-];
-
-const PRIMITIVES: {
-  icon: string;
-  name: string;
-  desc: string;
-  cmds: string[];
-}[] = [
+const PRIMITIVES = [
   {
-    icon: "⌨️",
     name: "Keyboard",
-    desc: "Type text, press keys, trigger hotkeys.",
-    cmds: ['mctrl keyboard type "Hello"', "mctrl keyboard hotkey cmd+c"],
+    desc: "Type text, press keys, and trigger hotkeys.",
+    cmds: ['mctrl keyboard type "Hello world"', "mctrl keyboard hotkey cmd+c"],
   },
   {
-    icon: "🖱️",
     name: "Mouse",
-    desc: "Move, click, scroll, drag anywhere on screen.",
+    desc: "Move, click, scroll, and drag anywhere on screen.",
     cmds: ["mctrl mouse click 500 300", "mctrl mouse scroll -3"],
   },
   {
-    icon: "🖥️",
     name: "Display",
-    desc: "Screen dimensions, screenshots, active window.",
+    desc: "Screen dimensions, screenshots, and active window info.",
     cmds: ["mctrl display screenshot -o shot.png", "mctrl display size --json"],
   },
   {
-    icon: "📋",
     name: "Clipboard",
     desc: "Read and write the system clipboard.",
     cmds: ['mctrl clipboard copy "data"', "mctrl clipboard view"],
   },
   {
-    icon: "👁️",
     name: "Screen OCR",
-    desc: "Extract text from the screen using Vision framework.",
+    desc: "Extract text from the screen using the Vision framework.",
     cmds: ["mctrl screen ocr", "mctrl screen ocr --json"],
   },
   {
-    icon: "🪟",
     name: "Windows",
-    desc: "List, focus, resize, move, minimize windows.",
+    desc: "List, focus, resize, move, and minimize windows.",
     cmds: ["mctrl window list --json", 'mctrl window focus "Terminal"'],
   },
   {
-    icon: "♿",
     name: "Accessibility",
-    desc: "Inspect the AX tree, get focused elements.",
+    desc: "Inspect the accessibility tree and get focused elements.",
     cmds: ["mctrl a11y tree --app Finder", "mctrl a11y focused --json"],
   },
   {
-    icon: "🌐",
     name: "Browser",
-    desc: "Control Chrome and Safari. Open URLs, run JS, get page source.",
+    desc: "Control Chrome and Safari. Open URLs, run JS, read page source.",
     cmds: ['mctrl browser open "https://example.com"', "mctrl browser tabs"],
   },
   {
-    icon: "📁",
     name: "Files",
-    desc: "Search, read, write, edit files on disk.",
+    desc: "Search, read, write, and edit files on disk.",
     cmds: ['mctrl files search "TODO" --dir .', "mctrl files read config.json"],
   },
   {
-    icon: "⚙️",
     name: "OS",
-    desc: "Notifications, launch apps, get frontmost app.",
+    desc: "Send notifications, launch apps, and get the frontmost app.",
     cmds: ['mctrl os notify "Done!"', "mctrl os frontmost-app --json"],
   },
   {
-    icon: "📅",
     name: "Calendar",
     desc: "List and create calendar events via Apple Calendar.",
     cmds: ["mctrl calendar list --days 7", 'mctrl calendar create "Meeting"'],
   },
   {
-    icon: "💬",
     name: "Messages",
-    desc: "Send and read iMessages via the Messages database.",
+    desc: "Send and read iMessages.",
     cmds: ['mctrl sms send "+1234" "Hello"', "mctrl sms get --limit 5"],
   },
 ];
@@ -91,47 +68,42 @@ const PRIMITIVES: {
 const FAQ_ITEMS = [
   {
     q: "What is mctrl?",
-    a: "mctrl is a command-line tool that gives AI agents fine-grained control over macOS. It exposes 14 primitives for typing, clicking, reading screens, managing windows, controlling browsers, and more — all through simple CLI commands.",
+    a: "mctrl is a command-line tool that gives AI agents fine-grained control over macOS. It exposes 14 primitives for typing, clicking, reading screens, managing windows, controlling browsers, and more.",
   },
   {
     q: "How does it work with AI agents?",
-    a: "AI agents call mctrl commands as shell tools. Each command returns structured output (text or JSON) that agents can parse and act on. The CLI is designed to be agent-friendly with comprehensive --help text and predictable output formats.",
+    a: "Agents call mctrl commands as shell tools. Each command returns structured output (text or JSON) that agents can parse and act on. The CLI is designed to be agent-friendly with comprehensive help text and predictable output.",
   },
   {
-    q: "Does it require root or special permissions?",
-    a: "mctrl requires macOS Accessibility permission for keyboard/mouse control, and may need additional permissions for specific features like screen recording, calendar access, or Messages. You'll be prompted to grant these in System Settings.",
+    q: "Does it require special permissions?",
+    a: "mctrl needs macOS Accessibility permission for keyboard and mouse control. Some features require additional permissions like screen recording or calendar access. You'll be prompted to grant these in System Settings.",
   },
   {
     q: "Is it open source?",
-    a: "Yes, mctrl is fully open source under the MIT license. You can find the source code, contribute, or fork it on GitHub.",
+    a: "Yes. mctrl is fully open source under the MIT license. You can find the source code, contribute, or fork it on GitHub.",
   },
 ];
 
 function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-black/80 backdrop-blur-md border-b border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5">
       <a href="#" className="flex items-center gap-2">
-        <span className="text-white font-mono font-bold text-xl tracking-tight">
+        <span className="text-white font-semibold text-base tracking-tight">
           mctrl
         </span>
       </a>
       <div className="hidden md:flex items-center gap-8">
-        {NAV_LINKS.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            className="text-neutral-400 hover:text-white text-sm transition-colors"
-          >
-            {link.label}
-          </a>
-        ))}
         <a
-          href="https://github.com/enoreyes/mctrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-white text-black px-4 py-2 text-sm font-medium hover:bg-neutral-200 transition-colors"
+          href="#features"
+          className="text-white/60 hover:text-white text-sm transition-colors"
         >
-          GitHub
+          Features
+        </a>
+        <a
+          href="#install"
+          className="text-white/60 hover:text-white text-sm transition-colors"
+        >
+          Install
         </a>
       </div>
     </nav>
@@ -142,45 +114,67 @@ function Hero() {
   return (
     <section className="relative min-h-screen flex items-end overflow-hidden">
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
         style={{ backgroundImage: "url(/images/hero.jpg)" }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30" />
-      <div className="relative z-10 max-w-4xl px-6 pb-20 md:pb-28 pt-32">
-        <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight">
-          Machine Control
-          <br />
-          for AI Agents
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+      <div className="relative z-10 px-8 pb-16 md:pb-20 max-w-xl">
+        <h1 className="text-4xl md:text-[3.25rem] font-semibold text-white leading-[1.1] tracking-[-0.02em]">
+          Give Your Agent
+          <br />a Mac
         </h1>
-        <p className="mt-6 text-lg md:text-xl text-neutral-300 max-w-2xl leading-relaxed">
-          Give your agents hands. mctrl exposes 14 macOS primitives — keyboard,
-          mouse, display, clipboard, OCR, windows, accessibility, browser,
-          files, OS, calendar, contacts, mail, and messages — as simple CLI
-          commands.
+        <p className="mt-5 text-[15px] md:text-base text-white/60 leading-relaxed max-w-md">
+          mctrl lets your agents type, click, read screens, fill forms,
+          control browsers, and more.
         </p>
-        <div className="mt-8 flex flex-wrap gap-4">
+        <div className="mt-8 flex items-center gap-5">
           <a
             href="#install"
-            className="bg-white text-black px-6 py-3 text-base font-semibold hover:bg-neutral-200 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-black px-5 py-2.5 rounded-full text-sm font-medium hover:bg-white/90 transition-colors"
           >
             Install mctrl
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              className="opacity-50"
+            >
+              <path
+                d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </a>
           <a
             href="https://github.com/enoreyes/mctrl"
             target="_blank"
             rel="noopener noreferrer"
-            className="border border-white/30 text-white px-6 py-3 text-base font-medium hover:bg-white/10 transition-colors"
+            className="text-white/60 text-sm font-medium hover:text-white transition-colors"
           >
             View on GitHub
           </a>
         </div>
       </div>
+
       <a
         href="#features"
-        className="absolute bottom-6 right-6 z-10 w-10 h-10 flex items-center justify-center border border-white/30 text-white hover:bg-white/10 transition-colors"
+        className="absolute bottom-6 right-8 z-10 w-9 h-9 flex items-center justify-center rounded-full border border-white/20 text-white/40 hover:text-white hover:border-white/40 transition-colors"
         aria-label="Scroll down"
       >
-        ↓
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path
+            d="M7 2.5V11.5M7 11.5L3 7.5M7 11.5L11 7.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </a>
     </section>
   );
@@ -189,29 +183,28 @@ function Hero() {
 function Features() {
   return (
     <section id="features" className="py-24 md:py-32 bg-white">
-      <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-4xl md:text-5xl font-extrabold text-center tracking-tight">
-          14 Primitives. One CLI.
+      <div className="max-w-5xl mx-auto px-8">
+        <p className="text-sm font-medium text-neutral-400 tracking-wide uppercase">
+          Primitives
+        </p>
+        <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.02em]">
+          14 commands. One CLI.
         </h2>
-        <p className="mt-4 text-center text-neutral-500 text-lg max-w-2xl mx-auto">
+        <p className="mt-3 text-neutral-500 text-base max-w-lg">
           Everything an agent needs to see, interact with, and control a Mac.
         </p>
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-neutral-200">
           {PRIMITIVES.map((p) => (
-            <div
-              key={p.name}
-              className="group border border-neutral-200 p-6 hover:border-neutral-400 transition-colors"
-            >
-              <div className="text-2xl mb-3">{p.icon}</div>
-              <h3 className="font-bold text-lg">{p.name}</h3>
-              <p className="text-neutral-500 text-sm mt-1 leading-relaxed">
+            <div key={p.name} className="bg-white p-6">
+              <h3 className="font-semibold text-sm">{p.name}</h3>
+              <p className="text-neutral-500 text-[13px] mt-1.5 leading-relaxed">
                 {p.desc}
               </p>
-              <div className="mt-4 space-y-1.5">
+              <div className="mt-3 space-y-1">
                 {p.cmds.map((cmd) => (
                   <code
                     key={cmd}
-                    className="block text-xs font-mono bg-neutral-100 text-neutral-700 px-3 py-1.5 overflow-x-auto"
+                    className="block text-[11px] font-mono text-neutral-400 truncate"
                   >
                     $ {cmd}
                   </code>
@@ -227,63 +220,40 @@ function Features() {
 
 function AgentDemo() {
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url(/images/features-bg.jpg)" }}
-      />
-      <div className="absolute inset-0 bg-black/80" />
-      <div className="relative z-10 max-w-4xl mx-auto px-6">
-        <h2 className="text-4xl md:text-5xl font-extrabold text-white text-center tracking-tight">
-          Built for Agents
-        </h2>
-        <p className="mt-4 text-center text-neutral-400 text-lg max-w-2xl mx-auto">
-          Every command returns structured output. Every flag has comprehensive
-          help. Agents can discover capabilities and parse results without
-          guessing.
+    <section className="py-24 md:py-32 bg-neutral-950">
+      <div className="max-w-3xl mx-auto px-8">
+        <p className="text-sm font-medium text-neutral-500 tracking-wide uppercase">
+          For Agents
         </p>
-        <div className="mt-12 bg-neutral-900 border border-neutral-700 overflow-hidden shadow-2xl">
-          <div className="flex items-center gap-2 px-4 py-3 bg-neutral-800 border-b border-neutral-700">
-            <div className="w-3 h-3 rounded-full bg-red-500/80" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-            <div className="w-3 h-3 rounded-full bg-green-500/80" />
-            <span className="ml-2 text-neutral-500 text-xs font-mono">
-              terminal
-            </span>
+        <h2 className="mt-3 text-3xl md:text-4xl font-semibold text-white tracking-[-0.02em]">
+          Structured output. Zero guessing.
+        </h2>
+        <p className="mt-3 text-neutral-500 text-base max-w-lg">
+          Every command returns parseable text or JSON. Every flag has
+          comprehensive help. Agents can discover and use capabilities
+          without any extra setup.
+        </p>
+        <div className="mt-10 rounded-xl bg-neutral-900 border border-neutral-800 overflow-hidden">
+          <div className="flex items-center gap-1.5 px-4 py-3 border-b border-neutral-800">
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
           </div>
-          <pre className="p-6 text-sm font-mono leading-relaxed overflow-x-auto text-neutral-300">
-            <code>
-              <span className="text-green-400">$</span> mctrl display
-              active-window --json{"\n"}
-              <span className="text-neutral-500">
-                {`{ "app": "Chrome", "title": "GitHub", "x": 0, "y": 25, "w": 1440, "h": 875 }`}
-              </span>
-              {"\n\n"}
-              <span className="text-green-400">$</span> mctrl screen ocr --json
-              {"\n"}
-              <span className="text-neutral-500">
-                {`[{ "text": "Sign in to GitHub", "confidence": 0.98, "x": 510, "y": 340 }]`}
-              </span>
-              {"\n\n"}
-              <span className="text-green-400">$</span> mctrl mouse click 510
-              340{"\n"}
-              <span className="text-neutral-500">Clicked at (510, 340)</span>
-              {"\n\n"}
-              <span className="text-green-400">$</span> mctrl keyboard type
-              {'"agent@example.com"'}
-              {"\n"}
-              <span className="text-neutral-500">
-                Typed 17 characters
-              </span>
-              {"\n\n"}
-              <span className="text-green-400">$</span> mctrl keyboard press
-              Tab{"\n"}
-              <span className="text-green-400">$</span> mctrl keyboard type
-              {'"••••••••"'}
-              {"\n"}
-              <span className="text-green-400">$</span> mctrl keyboard press
-              Return
-            </code>
+          <pre className="p-5 text-[13px] font-mono leading-[1.7] overflow-x-auto text-neutral-400">
+            <code>{`$ mctrl display active-window --json
+{ "app": "Chrome", "title": "GitHub", "x": 0, "y": 25 }
+
+$ mctrl screen ocr --json
+[{ "text": "Sign in", "confidence": 0.98, "x": 510, "y": 340 }]
+
+$ mctrl mouse click 510 340
+Clicked at (510, 340)
+
+$ mctrl keyboard type "agent@example.com"
+Typed 17 characters
+
+$ mctrl keyboard press Tab
+$ mctrl keyboard press Return`}</code>
           </pre>
         </div>
       </div>
@@ -294,50 +264,61 @@ function AgentDemo() {
 function Install() {
   return (
     <section id="install" className="py-24 md:py-32 bg-white">
-      <div className="max-w-3xl mx-auto px-6 text-center">
-        <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+      <div className="max-w-3xl mx-auto px-8">
+        <p className="text-sm font-medium text-neutral-400 tracking-wide uppercase">
           Get Started
-        </h2>
-        <p className="mt-4 text-neutral-500 text-lg">
-          Install mctrl globally with npm. Requires Node.js 18+ and macOS.
         </p>
-        <div className="mt-10 bg-neutral-900 border border-neutral-200 text-left overflow-hidden shadow-lg">
-          <div className="flex items-center gap-2 px-4 py-3 bg-neutral-800 border-b border-neutral-700">
-            <div className="w-3 h-3 rounded-full bg-red-500/80" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-            <div className="w-3 h-3 rounded-full bg-green-500/80" />
+        <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.02em]">
+          Install in 30 seconds.
+        </h2>
+        <p className="mt-3 text-neutral-500 text-base max-w-lg">
+          Clone, build, and link. Requires Node.js 18+ and macOS.
+        </p>
+        <div className="mt-10 rounded-xl bg-neutral-950 border border-neutral-800 overflow-hidden">
+          <div className="flex items-center gap-1.5 px-4 py-3 border-b border-neutral-800">
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
           </div>
-          <pre className="p-6 text-sm md:text-base font-mono text-neutral-300 overflow-x-auto">
-            <code>
-              <span className="text-neutral-500"># Install from source</span>
-              {"\n"}
-              <span className="text-green-400">$</span> git clone
-              https://github.com/enoreyes/mctrl.git{"\n"}
-              <span className="text-green-400">$</span> cd mctrl && npm install
-              && npm run build{"\n"}
-              <span className="text-green-400">$</span> npm link{"\n\n"}
-              <span className="text-neutral-500"># Verify installation</span>
-              {"\n"}
-              <span className="text-green-400">$</span> mctrl --help
-            </code>
+          <pre className="p-5 text-[13px] font-mono leading-[1.7] overflow-x-auto text-neutral-400">
+            <code>{`git clone https://github.com/enoreyes/mctrl.git
+cd mctrl && npm install && npm run build
+npm link
+
+mctrl --help`}</code>
           </pre>
         </div>
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="mt-8 flex items-center gap-5">
           <a
             href="https://github.com/enoreyes/mctrl"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-black text-white px-6 py-3 text-base font-semibold hover:bg-neutral-800 transition-colors"
+            className="inline-flex items-center gap-2 bg-neutral-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors"
           >
             View on GitHub
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              className="opacity-50"
+            >
+              <path
+                d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </a>
           <a
             href="https://github.com/enoreyes/mctrl/blob/main/README.md"
             target="_blank"
             rel="noopener noreferrer"
-            className="border border-neutral-300 text-neutral-700 px-6 py-3 text-base font-medium hover:bg-neutral-100 transition-colors"
+            className="text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors"
           >
-            Read the Docs
+            Read the docs
           </a>
         </div>
       </div>
@@ -351,15 +332,17 @@ function FaqItem({ q, a }: { q: string; a: string }) {
     <div className="border-b border-neutral-200">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-5 text-left"
+        className="w-full flex items-center justify-between py-5 text-left group"
       >
-        <span className="text-base font-medium">{q}</span>
-        <span className="text-xl text-neutral-400 ml-4 shrink-0">
+        <span className="text-[15px] font-medium">{q}</span>
+        <span className="text-neutral-300 group-hover:text-neutral-500 ml-4 shrink-0 text-lg transition-colors">
           {open ? "−" : "+"}
         </span>
       </button>
       {open && (
-        <p className="pb-5 text-neutral-500 leading-relaxed text-sm">{a}</p>
+        <p className="pb-5 text-neutral-500 leading-relaxed text-[14px]">
+          {a}
+        </p>
       )}
     </div>
   );
@@ -368,11 +351,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 function Faq() {
   return (
     <section id="faq" className="py-24 md:py-32 bg-neutral-50">
-      <div className="max-w-3xl mx-auto px-6">
-        <h2 className="text-4xl md:text-5xl font-extrabold text-center tracking-tight">
-          FAQ
-        </h2>
-        <div className="mt-12">
+      <div className="max-w-2xl mx-auto px-8">
+        <h2 className="text-2xl font-semibold tracking-[-0.02em]">FAQ</h2>
+        <div className="mt-8">
           {FAQ_ITEMS.map((item) => (
             <FaqItem key={item.q} q={item.q} a={item.a} />
           ))}
@@ -384,52 +365,33 @@ function Faq() {
 
 function Footer() {
   return (
-    <footer className="py-16 bg-white border-t border-neutral-200">
-      <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+    <footer className="py-12 bg-white border-t border-neutral-100">
+      <div className="max-w-5xl mx-auto px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
-          <h4 className="font-semibold mb-3">Product</h4>
-          <a
-            href="https://github.com/enoreyes/mctrl"
-            className="block text-neutral-500 hover:text-neutral-900 mb-1"
-          >
-            Open Source
-          </a>
-          <a
-            href="https://github.com/enoreyes/mctrl/blob/main/README.md"
-            className="block text-neutral-500 hover:text-neutral-900 mb-1"
-          >
-            Documentation
-          </a>
+          <span className="font-semibold text-sm">mctrl</span>
+          <p className="text-neutral-400 text-xs mt-1">
+            Machine control for AI agents. MIT License.
+          </p>
         </div>
-        <div>
-          <h4 className="font-semibold mb-3">Community</h4>
+        <div className="flex items-center gap-6 text-xs text-neutral-400">
           <a
             href="https://github.com/enoreyes/mctrl"
-            className="block text-neutral-500 hover:text-neutral-900 mb-1"
+            className="hover:text-neutral-900 transition-colors"
           >
             GitHub
           </a>
           <a
-            href="https://github.com/enoreyes/mctrl/issues"
-            className="block text-neutral-500 hover:text-neutral-900 mb-1"
+            href="https://github.com/enoreyes/mctrl/blob/main/README.md"
+            className="hover:text-neutral-900 transition-colors"
           >
-            Issues
+            Docs
           </a>
-        </div>
-        <div>
-          <h4 className="font-semibold mb-3">Legal</h4>
           <a
             href="https://github.com/enoreyes/mctrl/blob/main/LICENSE"
-            className="block text-neutral-500 hover:text-neutral-900 mb-1"
+            className="hover:text-neutral-900 transition-colors"
           >
-            MIT License
+            License
           </a>
-        </div>
-        <div>
-          <span className="font-mono font-bold text-lg">mctrl</span>
-          <p className="text-neutral-500 mt-2 leading-relaxed">
-            Machine control for AI agents.
-          </p>
         </div>
       </div>
     </footer>
