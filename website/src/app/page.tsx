@@ -59,6 +59,16 @@ const PRIMITIVES = [
     cmds: ["mctrl calendar list --days 7", 'mctrl calendar create "Meeting"'],
   },
   {
+    name: "Mail",
+    desc: "Read inbox, send email, and check unread count via Mail.app.",
+    cmds: ["mctrl mail inbox --unread --json", 'mctrl mail send --to "a@b.com" --subject "Hi" --body "Hello"'],
+  },
+  {
+    name: "Contacts",
+    desc: "Look up phone numbers, emails, and search contacts.",
+    cmds: ['mctrl contacts phone "John Doe"', 'mctrl contacts search "Jane"'],
+  },
+  {
     name: "Messages",
     desc: "Send and read iMessages.",
     cmds: ['mctrl sms send "+1234" "Hello"', "mctrl sms get --limit 5"],
