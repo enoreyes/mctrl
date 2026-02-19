@@ -4,10 +4,23 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 export function osascript(script: string): string {
-  return execFileSync("osascript", ["-e", script], {
-    encoding: "utf-8",
-    timeout: 15_000,
-  }).trim();
+  try {
+    return execFileSync("osascript", ["-e", script], {
+      encoding: "utf-8",
+      timeout: 15_000,
+    }).trim();
+  } catch (e: any) {
+    const stderr = e?.stderr?.toString?.() ?? "";
+    if (stderr.includes("Not authorized")) {
+      console.error(`Error: macOS denied permission. Grant Automation access in System Settings > Privacy & Security > Automation.`);
+      process.exit(1);
+    }
+    if (stderr.includes("not allowed assistive access")) {
+      console.error(`Error: Accessibility access required. Grant it in System Settings > Privacy & Security > Accessibility.`);
+      process.exit(1);
+    }
+    throw e;
+  }
 }
 
 export function shell(cmd: string, args: string[] = []): string {

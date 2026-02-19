@@ -77,16 +77,40 @@ a11y
   .action((opts: { json?: boolean }) => {
     ensureMac();
     try {
-      const role = osascript(
-        `tell application "System Events" to get role of focused UI element of first application process whose frontmost is true`
-      );
-      let title = "";
-      try { title = osascript(`tell application "System Events" to get title of focused UI element of first application process whose frontmost is true`); } catch {}
-      let value = "";
-      try { value = osascript(`tell application "System Events" to get value of focused UI element of first application process whose frontmost is true`); } catch {}
-      let desc = "";
-      try { desc = osascript(`tell application "System Events" to get description of focused UI element of first application process whose frontmost is true`); } catch {}
-      const data = { role, title, value, description: desc };
+      const raw = swift(`
+import Cocoa
+import ApplicationServices
+
+func attr(_ e: AXUIElement, _ a: String) -> String? {
+    var v: AnyObject?
+    guard AXUIElementCopyAttributeValue(e, a as CFString, &v) == .success else { return nil }
+    if let s = v as? String { return s }
+    if let n = v as? NSNumber { return n.stringValue }
+    return nil
+}
+
+guard let app = NSWorkspace.shared.frontmostApplication else { exit(1) }
+let ax = AXUIElementCreateApplication(app.processIdentifier)
+var focusedValue: AnyObject?
+let err = AXUIElementCopyAttributeValue(ax, kAXFocusedUIElementAttribute as String as CFString, &focusedValue)
+guard err == .success, let focused = focusedValue else {
+    print("No focused element found.")
+    exit(0)
+}
+let fe = focused as! AXUIElement
+let role = attr(fe, kAXRoleAttribute as String) ?? ""
+let title = attr(fe, kAXTitleAttribute as String) ?? ""
+let value = attr(fe, kAXValueAttribute as String) ?? ""
+let desc = attr(fe, kAXDescriptionAttribute as String) ?? ""
+let rd = attr(fe, kAXRoleDescriptionAttribute as String) ?? ""
+print("\\(role)|||\\(title)|||\\(value)|||\\(desc)|||\\(rd)")
+`);
+      if (raw.startsWith("No focused")) {
+        console.log(raw);
+        return;
+      }
+      const [role, title, value, desc, roleDesc] = raw.split("|||");
+      const data = { role, title, value, description: desc, roleDescription: roleDesc };
       if (opts.json) jsonOut(data);
       else {
         for (const [k, v] of Object.entries(data)) {
