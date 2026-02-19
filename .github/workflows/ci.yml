@@ -105,6 +105,9 @@ jobs:
 
           echo "TCC permissions granted successfully"
 
+      - name: Install Python Quartz bindings
+        run: pip3 install pyobjc-framework-Quartz
+
       - run: npm ci
       - name: Run all tests
         run: npm test
