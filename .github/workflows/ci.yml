@@ -43,23 +43,67 @@ jobs:
 
       - name: Grant TCC permissions for AppleScript and Accessibility
         run: |
-          # Grant Accessibility access
-          sudo sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db \
-            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','com.apple.Terminal',0,2,4,1,NULL,NULL,0,'UNUSED',NULL,0,1592919552);"
-          sudo sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db \
-            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','/usr/bin/osascript',1,2,4,1,NULL,NULL,0,'UNUSED',NULL,0,1592919552);"
-          sudo sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db \
-            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','/usr/local/opt/runner/provisioner/provisioner',1,2,4,1,NULL,NULL,0,'UNUSED',NULL,0,1592919552);"
-          # Grant Apple Events for System Events
-          sudo sqlite3 "$HOME/Library/Application Support/com.apple.TCC/TCC.db" \
-            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','/usr/bin/osascript',1,2,3,1,NULL,NULL,0,'com.apple.systemevents',X'fade0c000000003400000001000000060000000200000016636f6d2e6170706c652e73797374656d6576656e7473000000000003',NULL,1592919552);"
-          sudo sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db \
-            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','/usr/local/opt/runner/provisioner/provisioner',1,2,3,1,NULL,NULL,0,'com.apple.systemevents',X'fade0c000000003400000001000000060000000200000016636f6d2e6170706c652e73797374656d6576656e7473000000000003',NULL,1592919552);"
-          # Grant Apple Events for Finder
-          sudo sqlite3 "$HOME/Library/Application Support/com.apple.TCC/TCC.db" \
-            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','/usr/bin/osascript',1,2,3,1,NULL,NULL,0,'com.apple.finder',X'fade0c000000002c00000001000000060000000200000010636f6d2e6170706c652e66696e64657200000003',NULL,1592919552);"
-          sudo sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db \
-            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','/usr/local/opt/runner/provisioner/provisioner',1,2,3,1,NULL,NULL,0,'com.apple.finder',X'fade0c000000002c00000001000000060000000200000010636f6d2e6170706c652e66696e64657200000003',NULL,1592919552);"
+          SYSTEM_DB="/Library/Application Support/com.apple.TCC/TCC.db"
+          USER_DB="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
+
+          # Detect column count in TCC.db access table
+          COLS=$(sudo sqlite3 "$SYSTEM_DB" "pragma table_info(access);" | wc -l | tr -d ' ')
+          echo "TCC access table has $COLS columns"
+
+          # Build suffix for extra columns (macOS 14+ has 17 columns vs 13)
+          if [ "$COLS" -gt 13 ]; then
+            SUFFIX=",NULL,NULL,'UNUSED',1592919552"
+          else
+            SUFFIX=""
+          fi
+
+          # Grant Accessibility (system DB)
+          sudo sqlite3 "$SYSTEM_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','com.apple.Terminal',0,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+          sudo sqlite3 "$SYSTEM_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','/usr/bin/osascript',1,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+          sudo sqlite3 "$SYSTEM_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','/bin/bash',1,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+
+          # Grant Screen Capture (system DB)
+          sudo sqlite3 "$SYSTEM_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceScreenCapture','/usr/bin/osascript',1,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+          sudo sqlite3 "$SYSTEM_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceScreenCapture','com.apple.Terminal',0,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+          sudo sqlite3 "$SYSTEM_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceScreenCapture','/bin/bash',1,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+
+          # Grant Apple Events to System Events (user DB)
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','/usr/bin/osascript',1,2,0,1,NULL,NULL,0,'com.apple.systemevents',NULL,NULL,1592919552${SUFFIX});"
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','/bin/bash',1,2,0,1,NULL,NULL,0,'com.apple.systemevents',NULL,NULL,1592919552${SUFFIX});"
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','com.apple.Terminal',0,2,0,1,X'fade0c000000003000000001000000060000000200000012636f6d2e6170706c652e5465726d696e616c000000000003',NULL,0,'com.apple.systemevents',X'fade0c000000003400000001000000060000000200000016636f6d2e6170706c652e73797374656d6576656e7473000000000003',NULL,1592919552${SUFFIX});"
+
+          # Grant Apple Events to Finder (user DB)
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','/usr/bin/osascript',1,2,0,1,NULL,NULL,0,'com.apple.finder',NULL,NULL,1592919552${SUFFIX});"
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAppleEvents','/bin/bash',1,2,0,1,NULL,NULL,0,'com.apple.finder',NULL,NULL,1592919552${SUFFIX});"
+
+          # Grant Accessibility (user DB)
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','com.apple.Terminal',0,2,0,1,X'fade0c000000003000000001000000060000000200000012636f6d2e6170706c652e5465726d696e616c000000000003',NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','/usr/bin/osascript',1,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','/bin/bash',1,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+
+          # Grant Screen Capture (user DB)
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceScreenCapture','/usr/bin/osascript',1,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceScreenCapture','com.apple.Terminal',0,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+          sudo sqlite3 "$USER_DB" \
+            "INSERT OR REPLACE INTO access VALUES('kTCCServiceScreenCapture','/bin/bash',1,2,0,1,NULL,NULL,NULL,'UNUSED',NULL,0,1592919552${SUFFIX});"
+
+          echo "TCC permissions granted successfully"
 
       - run: npm ci
       - name: Run all tests
